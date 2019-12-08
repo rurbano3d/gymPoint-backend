@@ -1,9 +1,12 @@
-import { parseISO, addMonths } from 'date-fns';
+import { parseISO, addMonths, format } from 'date-fns';
+import pt from 'date-fns/locale/pt';
 import * as Yup from 'yup';
 
 import Registration from '../models/Registration';
 import Plan from '../models/Plan';
 import Student from '../models/Student';
+
+import Mail from '../../lib/Mail';
 
 class RegistrationController {
   async index(req, res) {
@@ -40,7 +43,13 @@ class RegistrationController {
 
     const { student_id, plan_id, start_date } = req.body;
 
-    const { duration, price } = await Plan.findOne({ where: { id: plan_id } });
+    const { name, email } = await Student.findOne({
+      where: { id: student_id },
+    });
+
+    const { title, duration, price } = await Plan.findOne({
+      where: { id: plan_id },
+    });
 
     const newPrice = duration * price;
 
@@ -53,6 +62,25 @@ class RegistrationController {
       end_date: newEndDate,
       price: newPrice,
     });
+
+    await Mail.sendMail({
+      to: `${name} <${email}>`,
+      subject: 'Matrícula na GymPoint',
+      template: 'registration',
+      context: {
+        student: name,
+        plan: title,
+        start_date: format(parseISO(start_date), " dd 'de' MMMM 'de' yyyy", {
+          locale: pt,
+        }),
+        end_date: format(newEndDate, " dd 'de' MMMM 'de' yyyy", {
+          locale: pt,
+        }),
+        duration,
+        price,
+      },
+    });
+
     return res.json({ registration });
   }
 
@@ -71,7 +99,13 @@ class RegistrationController {
 
     const { student_id, plan_id, start_date } = req.body;
 
-    const { duration, price } = await Plan.findOne({ where: { id: plan_id } });
+    const { name, email } = await Student.findOne({
+      where: { id: student_id },
+    });
+
+    const { title, duration, price } = await Plan.findOne({
+      where: { id: plan_id },
+    });
 
     const newPrice = duration * price;
 
@@ -83,6 +117,24 @@ class RegistrationController {
       start_date,
       end_date: newEndDate,
       price: newPrice,
+    });
+
+    await Mail.sendMail({
+      to: `${name} <${email}>`,
+      subject: 'Alteração de matrícula na GymPoint',
+      template: 'registration',
+      context: {
+        student: name,
+        plan: title,
+        start_date: format(parseISO(start_date), " dd 'de' MMMM 'de' yyyy", {
+          locale: pt,
+        }),
+        end_date: format(newEndDate, " dd 'de' MMMM 'de' yyyy", {
+          locale: pt,
+        }),
+        duration,
+        price,
+      },
     });
     return res.json({ updateRegistration });
   }
