@@ -1,12 +1,12 @@
-import { parseISO, addMonths, format } from 'date-fns';
-import pt from 'date-fns/locale/pt';
+import { parseISO, addMonths } from 'date-fns';
 import * as Yup from 'yup';
 
 import Registration from '../models/Registration';
 import Plan from '../models/Plan';
 import Student from '../models/Student';
 
-import Mail from '../../lib/Mail';
+import RegistrationMail from '../jobs/RegistrationMail';
+import Queue from '../../lib/Queue';
 
 class RegistrationController {
   async index(req, res) {
@@ -63,22 +63,14 @@ class RegistrationController {
       price: newPrice,
     });
 
-    await Mail.sendMail({
-      to: `${name} <${email}>`,
-      subject: 'Matrícula na GymPoint',
-      template: 'registration',
-      context: {
-        student: name,
-        plan: title,
-        start_date: format(parseISO(start_date), " dd 'de' MMMM 'de' yyyy", {
-          locale: pt,
-        }),
-        end_date: format(newEndDate, " dd 'de' MMMM 'de' yyyy", {
-          locale: pt,
-        }),
-        duration,
-        price,
-      },
+    await Queue.add(RegistrationMail.key, {
+      name,
+      title,
+      email,
+      duration,
+      price,
+      newEndDate,
+      start_date,
     });
 
     return res.json({ registration });
@@ -119,23 +111,16 @@ class RegistrationController {
       price: newPrice,
     });
 
-    await Mail.sendMail({
-      to: `${name} <${email}>`,
-      subject: 'Alteração de matrícula na GymPoint',
-      template: 'registration',
-      context: {
-        student: name,
-        plan: title,
-        start_date: format(parseISO(start_date), " dd 'de' MMMM 'de' yyyy", {
-          locale: pt,
-        }),
-        end_date: format(newEndDate, " dd 'de' MMMM 'de' yyyy", {
-          locale: pt,
-        }),
-        duration,
-        price,
-      },
+    await Queue.add(RegistrationMail.key, {
+      name,
+      title,
+      email,
+      duration,
+      price,
+      newEndDate,
+      start_date,
     });
+
     return res.json({ updateRegistration });
   }
 
