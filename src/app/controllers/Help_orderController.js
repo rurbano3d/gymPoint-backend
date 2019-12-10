@@ -1,5 +1,6 @@
 import * as Yup from 'yup';
 import Help_order from '../models/Help_order';
+import Student from '../models/Student';
 
 class Help_orderController {
   async index(req, res) {
@@ -8,6 +9,13 @@ class Help_orderController {
       where: { id: req.params.student_id },
       limit: 20,
       offset: (page - 1) * 20,
+      include: [
+        {
+          model: Student,
+          as: 'student',
+          attributes: ['id', 'name'],
+        },
+      ],
     });
     return res.json(help_orders);
   }
