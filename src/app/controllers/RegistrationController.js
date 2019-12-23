@@ -11,6 +11,12 @@ import Queue from '../../lib/Queue';
 class RegistrationController {
   async index(req, res) {
     const { page = 1 } = req.query;
+
+    if (req.params.id) {
+      const enroll = await Registration.findByPk(req.params.id);
+      return res.json(enroll);
+    }
+
     const registrations = await Registration.findAll({
       limit: 20,
       offset: (page - 1) * 20,

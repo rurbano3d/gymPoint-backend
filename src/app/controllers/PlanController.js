@@ -4,6 +4,12 @@ import Plan from '../models/Plan';
 class PlanController {
   async index(req, res) {
     const { page = 1 } = req.query;
+
+    if (req.params.id) {
+      const plan = await Plan.findByPk(req.params.id);
+      return res.json(plan);
+    }
+
     const plans = await Plan.findAll({
       limit: 20,
       offset: (page - 1) * 20,

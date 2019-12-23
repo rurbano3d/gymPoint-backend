@@ -12,6 +12,13 @@ class Help_orderController {
       where: { answer: null },
       limit: 20,
       offset: (page - 1) * 20,
+      include: [
+        {
+          model: Student,
+          as: 'student',
+          attributes: ['id', 'name'],
+        },
+      ],
     });
     return res.json(help_orders);
   }

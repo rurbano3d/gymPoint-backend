@@ -5,10 +5,17 @@ import Student from '../models/Student';
 class StudentController {
   async index(req, res) {
     const { page = 1, q } = req.query;
+
+    if (req.params.id) {
+      const student = await Student.findByPk(req.params.id);
+      return res.json(student);
+    }
+
     const students = await Student.findAll({
       where: q ? { name: { [Op.substring]: q } } : null,
       limit: 20,
       offset: (page - 1) * 20,
+      order: [['id', 'ASC']],
     });
     return res.json(students);
   }
@@ -82,6 +89,14 @@ class StudentController {
       weight,
       height,
     });
+  }
+
+  async delete(req, res) {
+    const student = await Student.findByPk(req.params.id);
+
+    await student.destroy();
+
+    return res.send(req.params.id);
   }
 }
 
