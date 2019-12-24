@@ -3,6 +3,7 @@ import { Router } from 'express';
 import UserController from './app/controllers/UserController';
 import SessionController from './app/controllers/SessionController';
 import StudentController from './app/controllers/StudentController';
+import SessionStudentController from './app/controllers/SessionStudentController';
 import PlanController from './app/controllers/PlanController';
 import RegistrationController from './app/controllers/RegistrationController';
 import CheckinController from './app/controllers/CheckinController';
@@ -12,6 +13,8 @@ import Answer_Help_orderController from './app/controllers/Answer_Help_orderCont
 import authMiddleware from './app/middlewares/auth';
 
 const routes = new Router();
+
+routes.post('/sessionStudents', SessionStudentController.store);
 
 routes.get('/students/:student_id/checkins', CheckinController.index);
 routes.post('/students/:student_id/checkins', CheckinController.store);
