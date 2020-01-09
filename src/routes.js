@@ -21,6 +21,7 @@ routes.post('/students/:student_id/checkins', CheckinController.store);
 
 routes.get('/students/:student_id/help-orders', Help_orderController.index);
 routes.post('/students/:student_id/help-orders', Help_orderController.store);
+routes.delete('/help-orders/:id', Help_orderController.delete);
 
 routes.post('/sessions', SessionController.store);
 routes.post('/users', UserController.store);

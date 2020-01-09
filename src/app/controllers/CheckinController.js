@@ -9,10 +9,9 @@ class CheckinController {
       where: { student_id: req.params.student_id },
       limit: 20,
       offset: (page - 1) * 20,
+      order: [['id', 'desc']],
     });
-    return res.json({
-      checkins,
-    });
+    return res.json(checkins);
   }
 
   async store(req, res) {

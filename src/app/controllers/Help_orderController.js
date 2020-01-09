@@ -6,9 +6,10 @@ class Help_orderController {
   async index(req, res) {
     const { page = 1 } = req.query;
     const help_orders = await Help_order.findAll({
-      where: { id: req.params.student_id },
-      limit: 20,
-      offset: (page - 1) * 20,
+      where: { student_id: req.params.student_id },
+      limit: 5,
+      offset: (page - 1) * 5,
+      order: [['id', 'desc']],
       include: [
         {
           model: Student,
@@ -35,6 +36,14 @@ class Help_orderController {
       student_id,
       question,
     });
+  }
+
+  async delete(req, res) {
+    const order = await Help_order.findByPk(req.params.id);
+
+    await order.destroy();
+
+    return res.send(order);
   }
 }
 
